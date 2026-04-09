@@ -21,15 +21,18 @@ jobs:
 
       - name: Build with Gradle
         run: |
+          # 建立一個假的 google-services.json 騙過編譯器
+          echo '{"project_info":{"project_number":"1","project_id":"fake"},"client":[{"client_info":{"mobilesdk_app_id":"1:1:android:fake","android_client_info":{"package_name":"com.polodarb.gmsphixit"}},"api_key":[{"current_key":"fake"}],"services":{}}],"configuration_version":"3"}' > app/google-services.json
+          
           # 自動尋找 gradlew 檔案所在位置並執行
           GRADLEW_PATH=$(find . -name gradlew)
           if [ -z "$GRADLEW_PATH" ]; then
-            echo "找不到 gradlew 檔案，嘗試直接使用系統 gradle 編譯"
             gradle assembleDebug
           else
             chmod +x $GRADLEW_PATH
             $GRADLEW_PATH assembleDebug
           fi
+
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
