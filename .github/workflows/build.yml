@@ -21,15 +21,12 @@ jobs:
           
       - name: Build with Gradle
         run: |
-          # 定義假 JSON 內容
-          JSON_CONTENT='{"project_info":{"project_number":"1","project_id":"fake"},"client":[{"client_info":{"mobilesdk_app_id":"1:1:android:fake","android_client_info":{"package_name":"ua.polodarb.gmsphixit"}},"api_key":[{"current_key":"fake"}],"services":{}}],"configuration_version":"3"}'
-          
-          # 在所有 app 目錄下可能的位置都塞一份，確保插件抓得到
-          mkdir -p app
-          echo $JSON_CONTENT > google-services.json
-          echo $JSON_CONTENT > app/google-services.json
-          
-          # 自動尋找 gradlew 並執行
+          # 1. 強行移除所有 build.gradle(.kts) 檔案中關於 Google Services 的插件
+          find . -name "build.gradle*" -exec sed -i '/com.google.gms.google-services/d' {} +
+          find . -name "build.gradle*" -exec sed -i '/googleServices/d' {} +
+          find . -name "build.gradle*" -exec sed -i '/com.google.firebase.crashlytics/d' {} +
+
+          # 2. 自動尋找 gradlew 並執行
           GRADLEW_PATH=$(find . -name gradlew | head -n 1)
           if [ -z "$GRADLEW_PATH" ]; then
             gradle assembleDebug
@@ -37,7 +34,6 @@ jobs:
             chmod +x "$GRADLEW_PATH"
             "$GRADLEW_PATH" assembleDebug
           fi
-
 
 
       - name: Upload APK
