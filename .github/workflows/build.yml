@@ -3,9 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: [ master, main, develop ]
-  pull_request:
-    branches: [ master, main, develop ]
-  workflow_dispatch: # 支援手動點擊執行
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,15 +19,20 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Build with Gradle
-        # 這裡會編譯 Debug 版 APK，不需要簽名即可測試
-        run: ./gradlew assembleDebug
+        run: |
+          # 自動尋找 gradlew 檔案所在位置並執行
+          GRADLEW_PATH=$(find . -name gradlew)
+          if [ -z "$GRADLEW_PATH" ]; then
+            echo "找不到 gradlew 檔案，嘗試直接使用系統 gradle 編譯"
+            gradle assembleDebug
+          else
+            chmod +x $GRADLEW_PATH
+            $GRADLEW_PATH assembleDebug
+          fi
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: gms-phixit-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: "**/build/outputs/apk/debug/*.apk"
