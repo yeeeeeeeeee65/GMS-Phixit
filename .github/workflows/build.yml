@@ -18,11 +18,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
-
+          
       - name: Build with Gradle
         run: |
-          # 建立一個假的 google-services.json 騙過編譯器
-          echo '{"project_info":{"project_number":"1","project_id":"fake"},"client":[{"client_info":{"mobilesdk_app_id":"1:1:android:fake","android_client_info":{"package_name":"com.polodarb.gmsphixit"}},"api_key":[{"current_key":"fake"}],"services":{}}],"configuration_version":"3"}' > app/google-services.json
+          # 建立對應正確包名 (ua.polodarb.gmsphixit) 的假 google-services.json
+          echo '{"project_info":{"project_number":"1","project_id":"fake"},"client":[{"client_info":{"mobilesdk_app_id":"1:1:android:fake","android_client_info":{"package_name":"ua.polodarb.gmsphixit"}},"api_key":[{"current_key":"fake"}],"services":{}}],"configuration_version":"3"}' > app/google-services.json
           
           # 自動尋找 gradlew 檔案所在位置並執行
           GRADLEW_PATH=$(find . -name gradlew)
